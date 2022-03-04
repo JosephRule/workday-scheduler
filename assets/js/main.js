@@ -1,13 +1,11 @@
-var currentDayEl = document.querySelector("#currentDay")
-var scheduleContainerEl = document.querySelector("#scheduleContainer")
 
 var loadOrInitalizeHours = function() {
     schedule = JSON.parse(localStorage.getItem("schedule"))
 
     if (!schedule) {
         schedule = []
-        for (var i = 0; i< 24; i++) {
-            schedule.push({hour: moment({hour:i}), text: ""})
+        for (var i = 6; i< 20; i++) {
+            schedule.push({id: i, text: ""})
         }
     };
 
@@ -15,31 +13,27 @@ var loadOrInitalizeHours = function() {
 }
 
 var createHourRow = function(scheduleItem) {
-    console.log(scheduleItem.hour.format("hha"))
-    rowEl = document.createElement('div');
-    // add row id count with text so that we can update the saved array
-    rowEl.classList = "row";
+    var rowEl = $("<div>")
+        .addClass("row")
+        .attr("data-id", scheduleItem.id);
+    var hourEl = $("<div>")
+        .addClass("col-1 hour time-block")
+        .text(moment({hour:scheduleItem.id}).format("hha"));
+    var textBoxEl = $("<textarea>")
+        .addClass("col")
+        .text(scheduleItem.text);
+    var buttonEl = $("<button>")
+        .addClass("col-1 saveBtn bi bi-save");
+    var saveEl = $("<span>")
+        .addClass("oi oi-task");
 
-    hourEl = document.createElement("div");
-    // add function call to update to past, present, future class
-    hourEl.classList = "col-1 hour time-block";
-    hourEl.textContent = scheduleItem.hour.format("hha");
-    rowEl.appendChild(hourEl);
 
-    textboxEl = document.createElement("textarea");
-    textboxEl.classList = "col";
-    textboxEl.textContent = scheduleItem.text;
-    rowEl.appendChild(textboxEl);
+    buttonEl.append(saveEl);
+    rowEl.append(hourEl, textBoxEl, buttonEl);
 
-    buttonEl = document.createElement("button");
-    buttonEl.classList = "col-1 saveBtn bi bi-save";
-    saveEl = document.createElement("span");
-    saveEl.classList = 'oi oi-task';
-    buttonEl.appendChild(saveEl);
-    rowEl.appendChild(buttonEl);
-
-    scheduleContainerEl.appendChild(rowEl);
+    $(".container").append(rowEl)
 }
+
 
 var createScheduler = function() {
     for (var i = 0; i<schedule.length; i++) {
@@ -51,15 +45,26 @@ var checkTimeStatus = function(hour) {
     // given time from array & current time , is row class past present or future?
 }
 
-var saveText = function(event) {
-
-
-}
 
 var updateJumboDate = function() {
-    currentDayEl.textContent = moment().format("dddd MMMM Do");
+    $(".date").text(moment().format("dddd MMMM Do"));
 }
+
+
+$(document).on("click", ".saveBtn", function() {
+    rowEl = $(this)
+        .parents()[0]
+    id = rowEl.getAttribute("data-id")
+    text = $(rowEl).children()[1].value
+
+    schedule[id].text = text
+    localStorage.setItem("schedule", JSON.stringify(schedule));
+  });
 
 schedule = loadOrInitalizeHours();
 updateJumboDate();
 createScheduler();
+
+setInterval(function () {
+    updateJumboDate();
+     }, 1200000);
