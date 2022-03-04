@@ -1,10 +1,11 @@
-
+startTime = 6;
+endTime = 20
 var loadOrInitalizeHours = function() {
     schedule = JSON.parse(localStorage.getItem("schedule"))
 
     if (!schedule) {
         schedule = []
-        for (var i = 6; i< 20; i++) {
+        for (var i = startTime; i< endTime; i++) {
             schedule.push({id: i, text: ""})
         }
     };
@@ -41,8 +42,15 @@ var createScheduler = function() {
     }
 }
 
-var checkTimeStatus = function(hour) {
-    // given time from array & current time , is row class past present or future?
+var updateTimeStatus = function(hour) {
+
+    for (var i=0; i<schedule.length; i++) {
+        console.log($(".row")[i])
+        // go get the hour and compare against present
+        // case update class = class-string
+        // add class to textbox
+
+    }
 }
 
 
@@ -56,8 +64,8 @@ $(document).on("click", ".saveBtn", function() {
         .parents()[0]
     id = rowEl.getAttribute("data-id")
     text = $(rowEl).children()[1].value
+    schedule[id - startTime].text = text
 
-    schedule[id].text = text
     localStorage.setItem("schedule", JSON.stringify(schedule));
   });
 
