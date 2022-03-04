@@ -1,5 +1,6 @@
 startTime = 6;
-endTime = 20
+endTime = 20;
+
 var loadOrInitalizeHours = function() {
     schedule = JSON.parse(localStorage.getItem("schedule"))
 
@@ -19,7 +20,7 @@ var createHourRow = function(scheduleItem) {
         .attr("data-id", scheduleItem.id);
     var hourEl = $("<div>")
         .addClass("col-1 hour time-block")
-        .text(moment({hour:scheduleItem.id}).format("hha"));
+        .text(moment({hour:scheduleItem.id}).format("ha"));
     var textBoxEl = $("<textarea>")
         .addClass("col")
         .text(scheduleItem.text);
@@ -35,7 +36,6 @@ var createHourRow = function(scheduleItem) {
     $(".container").append(rowEl)
 }
 
-
 var createScheduler = function() {
     for (var i = 0; i<schedule.length; i++) {
         createHourRow(schedule[i])
@@ -43,16 +43,19 @@ var createScheduler = function() {
 }
 
 var updateTimeStatus = function(hour) {
-
     for (var i=0; i<schedule.length; i++) {
-        console.log($(".row")[i])
-        // go get the hour and compare against present
-        // case update class = class-string
-        // add class to textbox
-
+        rowHour = $(".row")[i].getAttribute("data-id")
+        if (moment({hour:rowHour}) > moment()) {
+            $(".row")[i].children[1].classList = "col future"
+        }
+        else if (moment({hour:rowHour}) < moment().startOf("hour")) {
+            $(".row")[i].children[1].classList = "col past"
+        }
+        else {
+            $(".row")[i].children[1].classList = "col present"
+        }
     }
 }
-
 
 var updateJumboDate = function() {
     $(".date").text(moment().format("dddd MMMM Do"));
@@ -72,7 +75,9 @@ $(document).on("click", ".saveBtn", function() {
 schedule = loadOrInitalizeHours();
 updateJumboDate();
 createScheduler();
+updateTimeStatus();
 
 setInterval(function () {
     updateJumboDate();
-     }, 1200000);
+    updateTimeStatus();
+    }, 1200000);
